@@ -11,27 +11,64 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   DBHelper? dbHelper;
+  late Future<List<NotesModel>> notesList;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     dbHelper = DBHelper();
+    loadData();
+  }
+
+  loadData() async {
+    notesList = dbHelper!.getNotesList();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          'Notes SQL App',
-        ),
-      ),
       body: Column(
-        children: [],
+        children: [
+          Expanded(
+            child: FutureBuilder(
+              future: notesList,
+              builder: (context, AsyncSnapshot<List<NotesModel>> snapshot) {
+                return ListView.builder(
+                  reverse: true,
+                  shrinkWrap: true,
+                  itemCount: snapshot.data?.length,
+                  itemBuilder: (context, index) {
+                    return Dismissible(
+                      key: ValueKey<int>(snapshot.data![index].id!),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        color: Colors.red,
+                        child: const Icon(
+                          Icons.delete_forever,
+                        ),
+                      ),
+                      onDismissed: (DismissDirection direction) {
+                        setState(() {});
+                      },
+                      child: Card(
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.all(0),
+                          title: Text(snapshot.data![index].title.toString()),
+                          subtitle: Text(
+                              snapshot.data![index].description.toString()),
+                          trailing: Text(snapshot.data![index].age.toString()),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          )
+        ],
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.black,
         onPressed: () {
           dbHelper!
               .insert(
@@ -44,6 +81,8 @@ class _HomeScreenState extends State<HomeScreen> {
               .then(
             (value) {
               print('data added');
+              setState(() {});
+              notesList = dbHelper!.getNotesList();
             },
           ).onError(
             (error, stackTrace) {
@@ -51,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           );
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
