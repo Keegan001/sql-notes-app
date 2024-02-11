@@ -33,42 +33,52 @@ class _HomeScreenState extends State<HomeScreen> {
             child: FutureBuilder(
               future: notesList,
               builder: (context, AsyncSnapshot<List<NotesModel>> snapshot) {
-                return ListView.builder(
-                  reverse: true,
-                  shrinkWrap: true,
-                  itemCount: snapshot.data?.length,
-                  itemBuilder: (context, index) {
-                    return Dismissible(
-                      key: ValueKey<int>(snapshot.data![index].id!),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        color: Colors.red,
-                        child: const Icon(
-                          Icons.delete_forever,
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    //reverse: true,
+                    shrinkWrap: true,
+                    itemCount: snapshot.data?.length,
+                    itemBuilder: (context, index) {
+                      return Dismissible(
+                        key: ValueKey<int>(snapshot.data![index].id!),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          color: Colors.red,
+                          child: const Icon(
+                            Icons.delete_forever,
+                          ),
                         ),
-                      ),
-                      onDismissed: (DismissDirection direction) {
-                        setState(() {});
-                      },
-                      child: Card(
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(0),
-                          title: Text(snapshot.data![index].title.toString()),
-                          subtitle: Text(
-                              snapshot.data![index].description.toString()),
-                          trailing: Text(snapshot.data![index].age.toString()),
+                        onDismissed: (DismissDirection direction) {
+                          setState(
+                            () {
+                              dbHelper!.delete(snapshot.data![index].id!);
+                              notesList = dbHelper!.getNotesList();
+                              snapshot.data!.remove(snapshot.data![index]);
+                            },
+                          );
+                        },
+                        child: Card(
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.all(0),
+                            title: Text(snapshot.data![index].title.toString()),
+                            subtitle: Text(
+                                snapshot.data![index].description.toString()),
+                            trailing:
+                                Text(snapshot.data![index].age.toString()),
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                );
+                      );
+                    },
+                  );
+                } else {
+                  return CircularProgressIndicator();
+                }
               },
             ),
           )
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.black,
         onPressed: () {
           dbHelper!
               .insert(
