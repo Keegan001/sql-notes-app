@@ -1,27 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tutorial_1/home_screen.dart';
 
 void main() {
   runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          centerTitle: true,
-          title: const Text(
-            'Flutter Demo',
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          backgroundColor: Colors.blueGrey,
-        ),
-        body: const Center(
-          child: Image(
-            image: AssetImage('assets/images/kakashiimage.png'),
-          ),
-        ),
-      ),
-    ),
+    const MyApp(),
   );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: HomeScreen()
+    );
+  }
 }
