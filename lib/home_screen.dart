@@ -39,32 +39,47 @@ class _HomeScreenState extends State<HomeScreen> {
                     shrinkWrap: true,
                     itemCount: snapshot.data?.length,
                     itemBuilder: (context, index) {
-                      return Dismissible(
-                        key: ValueKey<int>(snapshot.data![index].id!),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          color: Colors.red,
-                          child: const Icon(
-                            Icons.delete_forever,
-                          ),
-                        ),
-                        onDismissed: (DismissDirection direction) {
-                          setState(
-                            () {
-                              dbHelper!.delete(snapshot.data![index].id!);
-                              notesList = dbHelper!.getNotesList();
-                              snapshot.data!.remove(snapshot.data![index]);
-                            },
-                          );
+                      return InkWell(
+                        onTap: () {
+                          dbHelper!.update(NotesModel(
+                            id: snapshot.data![index].id,
+                            title: 'update succesful',
+                            age: 20,
+                            description: 'text has been updated',
+                            email: 'lolol@gmail.com',
+                          ));
+                          setState(() {
+                            notesList = dbHelper!.getNotesList();
+                          });
                         },
-                        child: Card(
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.all(0),
-                            title: Text(snapshot.data![index].title.toString()),
-                            subtitle: Text(
-                                snapshot.data![index].description.toString()),
-                            trailing:
-                                Text(snapshot.data![index].age.toString()),
+                        child: Dismissible(
+                          key: ValueKey<int>(snapshot.data![index].id!),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            color: Colors.red,
+                            child: const Icon(
+                              Icons.delete_forever,
+                            ),
+                          ),
+                          onDismissed: (DismissDirection direction) {
+                            setState(
+                              () {
+                                dbHelper!.delete(snapshot.data![index].id!);
+                                notesList = dbHelper!.getNotesList();
+                                snapshot.data!.remove(snapshot.data![index]);
+                              },
+                            );
+                          },
+                          child: Card(
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(0),
+                              title:
+                                  Text(snapshot.data![index].title.toString()),
+                              subtitle: Text(
+                                  snapshot.data![index].description.toString()),
+                              trailing:
+                                  Text(snapshot.data![index].age.toString()),
+                            ),
                           ),
                         ),
                       );
